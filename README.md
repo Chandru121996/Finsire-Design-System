@@ -4,7 +4,7 @@ React components for the Finsire lending platform, built from the Figma file
 [Design System to Code](https://www.figma.com/design/Wkx269BTFQxRQCdkF1yYWD/Design-System-to-Code).
 Every colour, size and font comes from the Figma Variables, in Light and Dark mode.
 
-**Live component library (Storybook):** https://chandru121996.github.io/finsire-design-system/
+**Live component library (Storybook):** https://chandru121996.github.io/Finsire-Design-System/
 
 Built with React, TypeScript, Tailwind CSS, Radix UI and Storybook, in the style of shadcn/ui.
 
