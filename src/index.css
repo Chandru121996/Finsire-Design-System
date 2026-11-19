@@ -1,0 +1,73 @@
+/* Global styles for the Finsire design system. */
+@import 'tailwindcss';
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import 'material-symbols/rounded.css' layer(base);
+@import './styles/variables.css';
+@import './styles/theme.css';
+
+/* Dark mode is switched on by adding the "dark" class to <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Interaction states. data-force-state="hover" (or active, focus-visible) on an element or its parent
+   shows that state without the mouse. Only used in Storybook to display Figma's State variants. */
+@custom-variant hover {
+  @media (hover: hover) {
+    &:hover {
+      @slot;
+    }
+  }
+  &:where([data-force-state='hover'], [data-force-state='hover'] *) {
+    @slot;
+  }
+}
+@custom-variant active {
+  &:active {
+    @slot;
+  }
+  &:where([data-force-state='active'], [data-force-state='active'] *) {
+    @slot;
+  }
+}
+@custom-variant focus-visible {
+  &:focus-visible {
+    @slot;
+  }
+  &:where([data-force-state='focus-visible'], [data-force-state='focus-visible'] *) {
+    @slot;
+  }
+}
+@custom-variant focus-within {
+  &:focus-within {
+    @slot;
+  }
+  &:where([data-force-state='focus-visible'], [data-force-state='focus-visible'] *) {
+    @slot;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-surface-page font-sans text-body-base text-text-primary antialiased;
+  }
+}
+
+/* Use for every money and numeric column so digits line up (₹ 12,11,026). */
+@utility tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Slide-in animations for Sheet and Drawer. Turned off when the user prefers reduced motion. */
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+}
+@keyframes slide-in-left {
+  from { transform: translateX(-100%); }
+}
+@keyframes slide-in-bottom {
+  from { transform: translateY(100%); }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+}
