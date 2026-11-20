@@ -20,20 +20,22 @@ const trendBadge = { up: 'success', down: 'error', neutral: 'secondary' } as con
 /** Big number with a label and change (Figma "Stat card"). */
 export function StatCard({ label, value, icon = 'account_balance_wallet', change, comparison = 'vs last month', className }: StatCardProps) {
   return (
-    <div className={cn('flex flex-col gap-2 rounded-lg border border-border-default bg-surface-base p-6', className)}>
+    <div className={cn('flex flex-col gap-3 rounded-lg border border-border-default bg-surface-base p-4', className)}>
       <div className="flex items-center justify-between gap-2">
         <p className="truncate text-label-base text-text-secondary">{label}</p>
         <Icon name={icon} size={20} className="text-text-tertiary" />
       </div>
-      <p className="truncate text-heading-h2 text-text-primary tabular-nums">{value}</p>
-      {change && (
-        <div className="flex items-center gap-2">
-          <Badge variant={trendBadge[change.trend]} className="tabular-nums">
-            {change.value}
-          </Badge>
-          <span className="text-body-xsmall text-text-secondary">{comparison}</span>
-        </div>
-      )}
+      <div className="flex flex-col gap-2">
+        <p className="truncate text-heading-h2 text-text-primary tabular-nums">{value}</p>
+        {change && (
+          <div className="flex items-center gap-2">
+            <Badge variant={trendBadge[change.trend]} className="tabular-nums">
+              {change.value}
+            </Badge>
+            <span className="text-body-xsmall text-text-secondary">{comparison}</span>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
