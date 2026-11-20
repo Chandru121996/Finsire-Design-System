@@ -22,10 +22,11 @@ export function AccordionItem({ title, children, className, ...props }: Accordio
         <RadixAccordion.Trigger
           className={cn(
             'group flex flex-1 cursor-pointer items-center justify-between gap-4 py-4 text-left text-label-base text-text-primary',
-            'hover:underline outline-border-focus focus-visible:outline-2 focus-visible:outline-offset-2',
+            'outline-border-focus focus-visible:outline-2 focus-visible:outline-offset-2',
           )}
         >
-          {title}
+          {/* Only the heading text underlines on hover, never the arrow. */}
+          <span className="group-hover:underline">{title}</span>
           <Icon name="expand_more" size={20} className="text-text-secondary transition-transform group-data-[state=open]:rotate-180" />
         </RadixAccordion.Trigger>
       </RadixAccordion.Header>
