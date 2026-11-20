@@ -79,6 +79,53 @@ export const Default: Story = { args: { selectedIds: undefined } }
 /** Density=Compact: 40px rows, one line per cell. Long text ends in "…"; point at it for the full text. */
 export const Compact: Story = { args: { density: 'compact', pageSize: 10 } }
 
+/**
+ * Fixed columns: `<Table stickyStart={2} stickyEnd={2}>` keeps the checkbox + name and the status + actions in place
+ * while the middle columns scroll sideways. A shadow shows where columns are hidden.
+ * To scroll: the ‹ › buttons, Shift + mouse wheel, the scrollbar, a trackpad swipe, or click in and use ← →.
+ */
+export const FixedColumns: Story = {
+  render: () => (
+    <div className="w-[640px]">
+      <Table density="compact" stickyStart={2} stickyEnd={2} className="min-w-[1000px] table-fixed" aria-label="Transactions">
+        <colgroup>
+          <col className="w-12" />
+          <col className="w-[180px]" />
+          <col className="w-[140px]" />
+          <col className="w-[160px]" />
+          <col />
+          <col className="w-[120px]" />
+          <col className="w-[56px]" />
+        </colgroup>
+        <TableHeader>
+          <tr>
+            <th className="px-4"><Checkbox aria-label="Select all" /></th>
+            <TableHeaderCell>Name</TableHeaderCell>
+            <TableHeaderCell>Reference</TableHeaderCell>
+            <TableHeaderCell>Date</TableHeaderCell>
+            <TableHeaderCell align="right">Amount</TableHeaderCell>
+            <TableHeaderCell>Status</TableHeaderCell>
+            <th><span className="sr-only">Actions</span></th>
+          </tr>
+        </TableHeader>
+        <TableBody>
+          {sampleTransactions.slice(0, 6).map((t, i) => (
+            <TableRow key={t.id} selected={i === 1}>
+              <TableCell><Checkbox aria-label={`Select ${t.name}`} checked={i === 1} /></TableCell>
+              <TableCell><CellAvatarText initials={t.initials} text={t.name} /></TableCell>
+              <TableCell className="tabular-nums">{t.id}</TableCell>
+              <TableCell>{formatDateIN(t.date)}</TableCell>
+              <TableCell align="right"><CellNumber>{formatINR(t.amount, { signed: true })}</CellNumber></TableCell>
+              <TableCell>{statusBadge[t.status]}</TableCell>
+              <TableCell><CellActions>{rowActions(t)}</CellActions></TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  ),
+}
+
 /** Figma State=Empty. */
 export const Empty: Story = { args: { data: [] } }
 

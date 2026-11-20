@@ -84,7 +84,7 @@ export function MasterLog() {
         <FilterChip size="small" variant="all-filters" />
         {filters.map(label => <FilterChip key={label} size="small">{label}</FilterChip>)}
       </div>
-      <Table density="compact" containerClassName="min-h-0 flex-1" className="min-w-[1320px] table-fixed">
+      <Table density="compact" stickyStart={2} stickyEnd={2} containerClassName="min-h-0 flex-1" className="min-w-[1320px] table-fixed">
         <colgroup>
           <col className="w-12" />
           <col className="w-[120px]" />

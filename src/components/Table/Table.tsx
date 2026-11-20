@@ -1,7 +1,8 @@
-import { createContext, useContext, useRef, useState, type HTMLAttributes, type ReactNode, type TdHTMLAttributes, type ThHTMLAttributes } from 'react'
+import { createContext, useCallback, useContext, useEffect, useLayoutEffect, useRef, useState, type HTMLAttributes, type ReactNode, type TdHTMLAttributes, type ThHTMLAttributes } from 'react'
 import { cn } from '../../lib/utils'
 import { Avatar } from '../Avatar/Avatar'
 import { Icon } from '../Icon/Icon'
+import { IconButton } from '../IconButton/IconButton'
 import { Tooltip } from '../Tooltip/Tooltip'
 
 // Building blocks matching the Figma "Data Table" page. DataTable puts them together for you.
@@ -21,14 +22,143 @@ export interface TableProps extends HTMLAttributes<HTMLTableElement> {
   density?: TableDensity
   /** Class for the bordered frame around the table, e.g. a max height so the rows scroll. */
   containerClassName?: string
+  /** Number of columns fixed on the left while the others scroll sideways, e.g. 2 for checkbox + name. */
+  stickyStart?: number
+  /** Number of columns fixed on the right, e.g. 2 for status + actions. */
+  stickyEnd?: number
 }
 
-/** Bordered table frame. Scrolls sideways (and down, if you limit its height) when the content is bigger. */
-export function Table({ density = 'comfortable', className, containerClassName, children, ...props }: TableProps) {
+const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+/**
+ * Bordered table frame. Scrolls sideways (and down, if you limit its height) when the content is bigger.
+ * When it scrolls sideways:
+ * - stickyStart / stickyEnd columns stay in place, with a soft shadow where columns are hidden underneath.
+ * - ‹ › buttons at the edges (shown while the mouse is over the table) slide one column at a time.
+ * - Shift + mouse wheel, the scrollbar, and the ← → keys (after clicking into the table) also scroll.
+ */
+export function Table({ density = 'comfortable', stickyStart = 0, stickyEnd = 0, className, containerClassName, children, ...props }: TableProps) {
+  const scrollerRef = useRef<HTMLDivElement>(null)
+  const tableRef = useRef<HTMLTableElement>(null)
+  const [scroll, setScroll] = useState({ overflow: false, canStart: false, canEnd: false, startWidth: 0, endWidth: 0 })
+
+  // Column edges from the header row: x = left edge of each column, w = its width.
+  const measure = useCallback(() => {
+    const cells = Array.from(tableRef.current?.rows[0]?.cells ?? [])
+    const w = cells.map(cell => cell.offsetWidth)
+    const x = w.map((_, i) => w.slice(0, i).reduce((a, b) => a + b, 0))
+    const start = Math.min(stickyStart, cells.length)
+    const end = Math.min(stickyEnd, cells.length - start)
+    return { w, x, start, end, startWidth: w.slice(0, start).reduce((a, b) => a + b, 0), endWidth: w.slice(cells.length - end).reduce((a, b) => a + b, 0) }
+  }, [stickyStart, stickyEnd])
+
+  const update = useCallback(() => {
+    const el = scrollerRef.current
+    if (!el) return
+    const { startWidth, endWidth } = measure()
+    const next = {
+      overflow: el.scrollWidth > el.clientWidth + 1,
+      canStart: el.scrollLeft > 1,
+      canEnd: el.scrollLeft + el.clientWidth < el.scrollWidth - 1,
+      startWidth,
+      endWidth,
+    }
+    setScroll(prev => (Object.keys(next) as (keyof typeof next)[]).every(k => prev[k] === next[k]) ? prev : next)
+  }, [measure])
+
+  // Fix the first / last columns of every row in place. Runs after each render so new rows are included.
+  useLayoutEffect(() => {
+    const table = tableRef.current
+    if (!table) return
+    const { w, x, start, end } = measure()
+    const n = w.length
+    for (const row of Array.from(table.rows)) {
+      Array.from(row.cells).forEach((cell, i) => {
+        const side = row.cells.length !== n ? undefined : i < start ? 'start' : i >= n - end ? 'end' : undefined
+        if (side) cell.dataset.sticky = side
+        else delete cell.dataset.sticky
+        cell.style.left = side === 'start' ? `${x[i]}px` : ''
+        cell.style.right = side === 'end' ? `${x[n - 1] + w[n - 1] - x[i] - w[i]}px` : ''
+        const edge = (side === 'start' && i === start - 1) || (side === 'end' && i === n - end)
+        if (edge) cell.dataset.stickyEdge = side
+        else delete cell.dataset.stickyEdge
+      })
+    }
+    update()
+  })
+
+  useEffect(() => {
+    const observer = new ResizeObserver(() => update())
+    if (scrollerRef.current) observer.observe(scrollerRef.current)
+    if (tableRef.current) observer.observe(tableRef.current)
+    return () => observer.disconnect()
+  }, [update])
+
+  /** Slide the next hidden column fully into view. */
+  const scrollByColumn = (direction: 1 | -1) => {
+    const el = scrollerRef.current
+    if (!el) return
+    const { w, x, start, end, startWidth, endWidth } = measure()
+    const middle = w.map((_, i) => i).slice(start, w.length - end)
+    // Columns hidden by 24px or less count as visible, so every click moves a useful amount.
+    // With nothing left to reveal, go all the way to the end.
+    let left: number
+    if (direction === 1) {
+      const viewEnd = el.scrollLeft + el.clientWidth - endWidth
+      const i = middle.find(i => x[i] + w[i] > viewEnd + 24)
+      left = i === undefined ? el.scrollWidth : x[i] + w[i] - (el.clientWidth - endWidth)
+    } else {
+      const viewStart = el.scrollLeft + startWidth
+      const i = middle.findLast(i => x[i] < viewStart - 24)
+      left = i === undefined ? 0 : x[i] - startWidth
+    }
+    el.scrollTo({ left, behavior: reducedMotion() ? 'auto' : 'smooth' })
+  }
+
   return (
     <DensityContext.Provider value={density}>
-      <div className={cn('w-full overflow-auto rounded-lg border border-border-default bg-surface-base', containerClassName)}>
-        <table data-density={density} className={cn('w-full border-collapse text-left', className)} {...props}>{children}</table>
+      <div
+        data-can-scroll-start={scroll.canStart || undefined}
+        data-can-scroll-end={scroll.canEnd || undefined}
+        className={cn('group/table relative flex w-full flex-col overflow-hidden rounded-lg border border-border-default bg-surface-base', containerClassName)}
+      >
+        <div
+          ref={scrollerRef}
+          onScroll={update}
+          // Focusable when it scrolls sideways, so the ← → keys work.
+          tabIndex={scroll.overflow ? 0 : undefined}
+          role={scroll.overflow ? 'region' : undefined}
+          aria-label={scroll.overflow ? (props['aria-label'] ?? 'Table') : undefined}
+          className="table-scroller min-h-0 flex-1 overflow-auto outline-border-focus focus-visible:outline-2 focus-visible:-outline-offset-2"
+        >
+          <table ref={tableRef} data-density={density} className={cn('w-full border-collapse text-left', className)} {...props}>{children}</table>
+        </div>
+        {scroll.canStart && (
+          <IconButton
+            icon="chevron_left"
+            label="Show previous column"
+            size={32}
+            iconSize={20}
+            bordered
+            tabIndex={-1}
+            onClick={() => scrollByColumn(-1)}
+            className="pointer-events-none absolute top-1/2 z-20 -translate-y-1/2 rounded-full opacity-0 shadow-md transition-opacity group-hover/table:pointer-events-auto group-hover/table:opacity-100"
+            style={{ left: scroll.startWidth + 8 }}
+          />
+        )}
+        {scroll.canEnd && (
+          <IconButton
+            icon="chevron_right"
+            label="Show next column"
+            size={32}
+            iconSize={20}
+            bordered
+            tabIndex={-1}
+            onClick={() => scrollByColumn(1)}
+            className="pointer-events-none absolute top-1/2 z-20 -translate-y-1/2 rounded-full opacity-0 shadow-md transition-opacity group-hover/table:pointer-events-auto group-hover/table:opacity-100"
+            style={{ right: scroll.endWidth + 8 }}
+          />
+        )}
       </div>
     </DensityContext.Provider>
   )
@@ -38,7 +168,7 @@ export function Table({ density = 'comfortable', className, containerClassName, 
 export function TableHeader({ className, ...props }: HTMLAttributes<HTMLTableSectionElement>) {
   return (
     <thead
-      className={cn('sticky top-0 z-10 bg-surface-muted [&_tr]:border-b [&_tr]:border-border-default', className)}
+      className={cn('sticky top-0 z-10 bg-surface-muted [&_tr]:border-b [&_tr]:border-border-default [&_tr]:bg-inherit', className)}
       {...props}
     />
   )
@@ -61,7 +191,7 @@ export function TableRow({ selected, className, ...props }: TableRowProps) {
       data-selected={selected || undefined}
       aria-selected={selected}
       className={cn(
-        'border-b border-border-default transition-colors last:border-b-0 hover:bg-interaction-hover data-selected:bg-interaction-selected',
+        'border-b border-border-default bg-surface-base transition-colors last:border-b-0 hover:bg-interaction-hover data-selected:bg-interaction-selected',
         density === 'compact' ? 'h-10' : 'h-[56px]',
         className,
       )}

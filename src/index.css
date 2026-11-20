@@ -71,3 +71,43 @@
 @keyframes fade-in {
   from { opacity: 0; }
 }
+
+/* Table fixed columns (Table stickyStart / stickyEnd). The cells take their row's colour so hover and
+   selected rows look the same under the fixed columns. */
+[data-sticky] {
+  position: sticky;
+  z-index: 1;
+  background-color: inherit;
+}
+/* Soft shadow on the inner edge of the fixed columns, shown only while columns are hidden underneath. */
+[data-sticky-edge]::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms;
+  --edge-shadow: rgb(12 17 21 / 0.1);
+}
+.dark [data-sticky-edge]::after {
+  --edge-shadow: rgb(0 0 0 / 0.45);
+}
+[data-sticky-edge='start']::after {
+  right: -12px;
+  background: linear-gradient(to right, var(--edge-shadow), transparent);
+}
+[data-sticky-edge='end']::after {
+  left: -12px;
+  background: linear-gradient(to left, var(--edge-shadow), transparent);
+}
+[data-can-scroll-start] [data-sticky-edge='start']::after,
+[data-can-scroll-end] [data-sticky-edge='end']::after {
+  opacity: 1;
+}
+/* Thin scrollbar that stays visible, so mouse users can drag it. */
+.table-scroller {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-strong) transparent;
+}

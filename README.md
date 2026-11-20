@@ -60,6 +60,8 @@ import { Button, Badge, KpiCard, formatINR } from './index'
 - Money: `formatINR`, `formatINRCompact` (₹224 Cr, ₹3.4 L), `formatNumberIN` and `formatDateIN` use Indian grouping.
 - Dense screens: `<Table density="compact">` / `<DataTable density="compact">` (40px rows, one line per cell, full text in a tooltip),
   `<FilterChip size="small">`, `<PaginationBar size="small">` and `<PageHeader compact>`. The Master Log screen uses all of them.
+- Wide tables: `<Table stickyStart={2} stickyEnd={2}>` keeps the first and last columns fixed while the middle scrolls sideways
+  (‹ › buttons on hover, Shift + mouse wheel, the scrollbar, a trackpad swipe, or the ← → keys).
 
 ## Design tokens
 

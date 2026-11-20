@@ -43,6 +43,9 @@ export interface DataTableProps<Row> {
   onRowClick?: (row: Row) => void
   /** Row height: comfortable (56px, default) or compact (40px, one line per cell). */
   density?: TableDensity
+  /** Columns fixed on the left / right while the rest scroll sideways. Count the checkbox and actions columns too. */
+  stickyStart?: number
+  stickyEnd?: number
   /** Figma State=Loading. */
   loading?: boolean
   /** Shown when there are no rows (Figma State=Empty), usually an EmptyState. */
@@ -68,6 +71,8 @@ export function DataTable<Row>({
   rowActions,
   onRowClick,
   density = 'comfortable',
+  stickyStart,
+  stickyEnd,
   loading = false,
   empty,
   pageSize = 10,
@@ -176,7 +181,7 @@ export function DataTable<Row>({
         </DropdownMenu>
       </div>
 
-      <Table aria-busy={loading} density={density}>
+      <Table aria-busy={loading} density={density} stickyStart={stickyStart} stickyEnd={stickyEnd}>
         <colgroup>
           {selectable && <col className="w-[56px]" />}
           {visibleColumns.map(column => <col key={column.id} style={column.width ? { width: column.width } : undefined} />)}
