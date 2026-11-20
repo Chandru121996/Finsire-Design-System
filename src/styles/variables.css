@@ -144,7 +144,7 @@
   --color-chart-series-3: var(--palette-error-500);
   --color-chart-series-4: var(--palette-warning-500);
   --color-chart-series-5: var(--palette-accent-500);
-  --color-chart-series-6: var(--palette-primary-600);
+  --color-chart-series-6: var(--palette-primary-400);
   --color-chart-grid: var(--palette-neutral-200);
   --color-chart-axis: var(--palette-neutral-500);
 
@@ -266,12 +266,12 @@
   --color-accent-container: var(--palette-accent-900);
   --color-accent-on-container: var(--palette-accent-100);
   --color-accent-border: var(--palette-accent-700);
-  --color-chart-series-1: var(--palette-info-300);
-  --color-chart-series-2: var(--palette-success-300);
-  --color-chart-series-3: var(--palette-error-300);
-  --color-chart-series-4: var(--palette-warning-300);
-  --color-chart-series-5: var(--palette-accent-300);
-  --color-chart-series-6: var(--palette-primary-300);
+  --color-chart-series-1: var(--palette-info-500);
+  --color-chart-series-2: var(--palette-success-500);
+  --color-chart-series-3: var(--palette-error-500);
+  --color-chart-series-4: var(--palette-warning-500);
+  --color-chart-series-5: var(--palette-accent-500);
+  --color-chart-series-6: var(--palette-primary-400);
   --color-chart-grid: var(--palette-neutral-800);
   --color-chart-axis: var(--palette-neutral-400);
 }
