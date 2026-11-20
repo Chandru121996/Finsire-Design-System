@@ -84,16 +84,17 @@ export function MasterLog() {
         <FilterChip size="small" variant="all-filters" />
         {filters.map(label => <FilterChip key={label} size="small">{label}</FilterChip>)}
       </div>
-      <Table density="compact" stickyStart={2} stickyEnd={2} containerClassName="min-h-0 flex-1" className="min-w-[1320px] table-fixed">
+      <Table density="compact" stickyStart={2} stickyEnd={2} containerClassName="min-h-0 flex-1" className="min-w-[1408px] table-fixed">
+        {/* Event/Description is wide enough for today's longest event (about 50 characters); longer text ends in "…" with a tooltip. Admin/RM takes the rest (at least 240px, via the table min-width). */}
         <colgroup>
           <col className="w-12" />
           <col className="w-[120px]" />
-          <col className="w-[130px]" />
-          <col className="w-[160px]" />
+          <col className="w-[120px]" />
+          <col className="w-[144px]" />
+          <col className="w-[344px]" />
+          <col className="w-[176px]" />
           <col />
-          <col className="w-[200px]" />
-          <col className="w-[250px]" />
-          <col className="w-[100px]" />
+          <col className="w-[112px]" />
           <col className="w-[104px]" />
         </colgroup>
         <TableHeader>

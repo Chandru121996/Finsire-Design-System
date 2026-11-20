@@ -10,7 +10,7 @@ import { Tooltip } from '../Tooltip/Tooltip'
 /**
  * Figma Density.
  * - comfortable: 56px rows, cells may wrap to two lines.
- * - compact: 40px rows, one line per cell (long text ends in "…" with a tooltip). For dense screens such as the Master Log.
+ * - compact: 40px rows, 12px text, one line per cell (long text ends in "…" with a tooltip). For dense screens such as the Master Log.
  */
 export type TableDensity = 'comfortable' | 'compact'
 
@@ -253,7 +253,7 @@ export function TableCell({ align = 'left', className, ...props }: TableCellProp
   const density = useDensity()
   return (
     <td
-      className={cn('px-4 text-body-small text-text-primary', density === 'compact' && 'whitespace-nowrap', align === 'right' && 'text-right', className)}
+      className={cn('px-4 text-text-primary', density === 'compact' ? 'whitespace-nowrap text-body-xsmall' : 'text-body-small', align === 'right' && 'text-right', className)}
       {...props}
     />
   )
@@ -279,7 +279,7 @@ export function CellTwoLines({ text, subtext }: { text: ReactNode; subtext: Reac
   if (useDensity() === 'compact') {
     return (
       <TruncatedText>
-        <span className="text-label-base text-text-primary">{text}</span>
+        <span className="text-label-small text-text-primary">{text}</span>
         <span className="ml-2 text-body-xsmall text-text-secondary">{subtext}</span>
       </TruncatedText>
     )
@@ -294,7 +294,8 @@ export function CellTwoLines({ text, subtext }: { text: ReactNode; subtext: Reac
 
 /** Type=Number: medium weight, digits lined up. Use inside a right-aligned TableCell. */
 export function CellNumber({ children }: { children: ReactNode }) {
-  return <span className="text-label-base whitespace-nowrap text-text-primary tabular-nums">{children}</span>
+  const compact = useDensity() === 'compact'
+  return <span className={cn('whitespace-nowrap text-text-primary tabular-nums', compact ? 'text-label-small' : 'text-label-base')}>{children}</span>
 }
 
 /** Type=Text and badge: text with a badge under it. Compact: badge beside the text. */
@@ -302,7 +303,7 @@ export function CellTextBadge({ text, badge }: { text: ReactNode; badge: ReactNo
   if (useDensity() === 'compact') {
     return (
       <div className="flex min-w-0 items-center gap-2">
-        <TruncatedText className="text-body-small text-text-primary">{text}</TruncatedText>
+        <TruncatedText className="text-body-xsmall text-text-primary">{text}</TruncatedText>
         <span className="flex shrink-0">{badge}</span>
       </div>
     )
@@ -321,7 +322,7 @@ export function CellAvatarText({ initials, text, subtext }: { initials: string; 
   return (
     <div className={cn('flex min-w-0 items-center', compact ? 'gap-2' : 'gap-3')}>
       <Avatar initials={initials} size={compact ? 24 : 32} />
-      {subtext ? <CellTwoLines text={text} subtext={subtext} /> : <TruncatedText className="text-body-small text-text-primary">{text}</TruncatedText>}
+      {subtext ? <CellTwoLines text={text} subtext={subtext} /> : <TruncatedText className={cn('text-text-primary', compact ? 'text-body-xsmall' : 'text-body-small')}>{text}</TruncatedText>}
     </div>
   )
 }
