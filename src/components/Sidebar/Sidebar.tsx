@@ -3,6 +3,7 @@ import { cn } from '../../lib/utils'
 import { Avatar } from '../Avatar/Avatar'
 import { Icon } from '../Icon/Icon'
 import { IconButton } from '../IconButton/IconButton'
+import { FinsireLogo, FinsireMark } from '../Logo/Logo'
 import { NavItem, SidebarItem } from './NavItem'
 
 export interface SidebarLink {
@@ -25,18 +26,19 @@ export interface SidebarGroup {
 
 /**
  * Figma Sidebar State.
- * - collapsed: 72px icon rail. Hovering it shows the full sidebar on top of the page (Hover expanded).
- * - expanded: 260px, opened with the » button. Closes again after you pick a page.
- * - pinned: 260px and stays open.
+ * - collapsed: 72px rail with the F mark. Hovering it (or tabbing into it) shows the full sidebar
+ *   on top of the page (Figma "Hover expanded").
+ * - pinned: 260px and stays open. The pin button switches between the two.
  */
-export type SidebarState = 'collapsed' | 'expanded' | 'pinned'
+export type SidebarState = 'collapsed' | 'pinned'
 
 export interface SidebarProps {
   groups: SidebarGroup[]
   /** Id of the current page's link. */
   activeId?: string
   onNavigate?: (link: SidebarLink) => void
-  brand?: { name: string; icon?: string }
+  /** Logos for the open and collapsed sidebar. Default: the Finsire logo and F mark. */
+  logo?: { full: ReactNode; mark: ReactNode }
   workspace?: { name: string; detail?: string; initials: string; onClick?: () => void }
   state?: SidebarState
   defaultState?: SidebarState
@@ -53,7 +55,7 @@ export function Sidebar({
   groups,
   activeId,
   onNavigate,
-  brand = { name: 'Fintrack', icon: 'account_balance' },
+  logo = { full: <FinsireLogo />, mark: <FinsireMark /> },
   workspace,
   state,
   defaultState = 'pinned',
@@ -85,10 +87,10 @@ export function Sidebar({
     })
 
   const collapsed = current === 'collapsed'
-  const showFull = !collapsed || hovering
+  const pinned = current === 'pinned'
+  const showFull = pinned || hovering
   const navigate = (link: SidebarLink) => {
     onNavigate?.(link)
-    if (current === 'expanded') setState('collapsed')
     setHovering(false)
   }
 
@@ -102,24 +104,21 @@ export function Sidebar({
       )}
     >
       {showFull ? (
-        <div className="flex h-16 shrink-0 items-start gap-2 px-1 pt-1">
-          <BrandLogo icon={brand.icon} />
-          <span className="truncate text-heading-h5 text-text-primary">{brand.name}</span>
+        <div className="flex shrink-0 items-center gap-2 px-1 pt-1">
+          {logo.full}
           <span className="flex-1" />
+          {/* Outline pin = not pinned; filled pin = pinned. Clicking switches. */}
           <IconButton
             icon="push_pin"
-            label={current === 'pinned' ? 'Unpin sidebar' : 'Pin sidebar open'}
+            iconStyle={pinned ? 'filled' : 'outlined'}
+            label={pinned ? 'Unpin sidebar' : 'Pin sidebar open'}
             size={32}
-            active={current === 'pinned'}
-            onClick={() => setState(current === 'pinned' ? 'expanded' : 'pinned')}
+            active={pinned}
+            onClick={() => setState(pinned ? 'collapsed' : 'pinned')}
           />
-          <IconButton icon="keyboard_double_arrow_left" label="Collapse sidebar" size={32} onClick={() => { setState('collapsed'); setHovering(false) }} />
         </div>
       ) : (
-        <div className="flex shrink-0 flex-col items-center gap-2 pt-1">
-          <BrandLogo icon={brand.icon} />
-          <IconButton icon="keyboard_double_arrow_right" label="Expand sidebar" size={32} onClick={() => setState('expanded')} />
-        </div>
+        <div className="flex shrink-0 flex-col items-center pt-2">{logo.mark}</div>
       )}
 
       {workspace &&
@@ -205,16 +204,13 @@ export function Sidebar({
       style={{ width: collapsed ? 72 : 260 }}
       onMouseEnter={() => collapsed && setHovering(true)}
       onMouseLeave={() => setHovering(false)}
+      // Keyboard users open the collapsed sidebar by tabbing into it.
+      onFocus={() => collapsed && setHovering(true)}
+      onBlur={event => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setHovering(false)
+      }}
     >
       {panel}
     </div>
-  )
-}
-
-function BrandLogo({ icon = 'account_balance' }: { icon?: string }) {
-  return (
-    <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-primary-default text-primary-on-default">
-      <Icon name={icon} size={20} />
-    </span>
   )
 }

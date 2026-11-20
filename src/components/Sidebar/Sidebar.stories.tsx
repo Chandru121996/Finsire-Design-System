@@ -26,14 +26,12 @@ function Demo({ initial, ...args }: Story['args'] & { initial: SidebarState }) {
   )
 }
 
-/** Figma State=Pinned. Click Users / Assets to open them; click the pin to unpin; « collapses. */
+/** Figma State=Pinned (filled pin). Click the pin to unpin: the sidebar collapses to the F mark. */
 export const Pinned: Story = { render: args => <Demo {...args} initial="pinned" defaultOpenIds={['users', 'assets', 'loan-action']} /> }
 
-/** Figma State=Collapsed (72 rail). Hover it to see State=Hover expanded; » opens State=Expanded. */
+/** Figma State=Collapsed (72 rail, F mark). Hover it to see State=Hover expanded (outline pin); click the pin to keep it open. */
 export const Collapsed: Story = { render: args => <Demo {...args} initial="collapsed" /> }
 
-/** Figma State=Expanded: opened with », closes after you pick a page. */
-export const Expanded: Story = { render: args => <Demo {...args} initial="expanded" /> }
 
 /** Figma "Nav item": Item, Parent, Child × Default, Hover, Active (Parent also Open). */
 export const NavItems: Story = {

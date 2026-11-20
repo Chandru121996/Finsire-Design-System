@@ -29,6 +29,7 @@
   --color-primary-on-default: var(--color-primary-on-default);
   --color-primary-container: var(--color-primary-container);
   --color-primary-on-container: var(--color-primary-on-container);
+  --color-primary-logo: var(--color-primary-logo);
   --color-secondary-default: var(--color-secondary-default);
   --color-secondary-hover: var(--color-secondary-hover);
   --color-secondary-pressed: var(--color-secondary-pressed);

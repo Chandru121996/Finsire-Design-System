@@ -13,7 +13,7 @@ const preview: Preview = {
     // The page background comes from the surface/page token, so it follows Light and Dark.
     backgrounds: { disable: true },
     options: {
-      storySort: { order: ['Foundations', ['Colors', 'Typography', 'Spacing', 'Radius', 'Shadows', 'Icons'], 'Components', 'Reference screens'] },
+      storySort: { order: ['Foundations', ['Colors', 'Typography', 'Spacing', 'Radius', 'Shadows', 'Icons', 'Logo'], 'Components', 'Reference screens'] },
     },
   },
   decorators: [
