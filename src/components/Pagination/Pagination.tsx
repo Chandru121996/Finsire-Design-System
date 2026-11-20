@@ -19,23 +19,28 @@ const itemBase =
   'flex shrink-0 cursor-pointer items-center justify-center rounded-md text-label-base text-text-primary transition-colors hover:bg-interaction-hover outline-border-focus focus-visible:outline-2 focus-visible:-outline-offset-2 disabled:pointer-events-none disabled:text-disabled-foreground'
 
 /** Figma "Page item" (Number). Active is the current page. */
-export function PageNumber({ page, active, onSelect }: { page: number; active?: boolean; onSelect?: (page: number) => void }) {
+export function PageNumber({ page, active, onSelect, size = 'medium' }: { page: number; active?: boolean; onSelect?: (page: number) => void; size?: 'small' | 'medium' }) {
   return (
     <button
       type="button"
       aria-label={`Page ${page}`}
       aria-current={active ? 'page' : undefined}
       onClick={() => onSelect?.(page)}
-      className={cn(itemBase, 'size-[36px] tabular-nums', active && 'border border-border-strong bg-surface-base shadow-xs hover:bg-surface-base')}
+      className={cn(
+        itemBase,
+        'tabular-nums',
+        size === 'small' ? 'size-8 text-label-small' : 'size-[36px]',
+        active && 'border border-border-strong bg-surface-base shadow-xs hover:bg-surface-base',
+      )}
     >
       {page}
     </button>
   )
 }
 
-export function PageEllipsis() {
+export function PageEllipsis({ size = 'medium' }: { size?: 'small' | 'medium' }) {
   return (
-    <span aria-hidden className="flex size-[36px] shrink-0 items-center justify-center text-text-secondary">
+    <span aria-hidden className={cn('flex shrink-0 items-center justify-center text-text-secondary', size === 'small' ? 'size-8' : 'size-[36px]')}>
       <Icon name="more_horiz" size={16} />
     </span>
   )

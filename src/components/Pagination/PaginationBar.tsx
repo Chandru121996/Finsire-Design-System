@@ -17,6 +17,8 @@ export interface PaginationBarProps {
   pageSizeOptions?: number[]
   /** Word used in the summary, e.g. "1–15 of 150 items". */
   itemLabel?: string
+  /** Small (32px page buttons, smaller text) for dense screens. Default medium. */
+  size?: 'small' | 'medium'
   className?: string
 }
 
@@ -29,14 +31,15 @@ export function PaginationBar({
   onPageSizeChange,
   pageSizeOptions = [10, 15, 25, 50, 100],
   itemLabel = 'items',
+  size = 'medium',
   className,
 }: PaginationBarProps) {
   const pageCount = Math.max(1, Math.ceil(total / pageSize))
   const from = total === 0 ? 0 : (page - 1) * pageSize + 1
   const to = Math.min(page * pageSize, total)
   return (
-    <div className={cn('flex items-center gap-4 px-4 py-2', className)}>
-      <p className="min-w-0 flex-1 truncate text-body-small text-text-secondary tabular-nums">
+    <div className={cn('flex items-center gap-4 px-4', size === 'small' ? 'py-1' : 'py-2', className)}>
+      <p className={cn('min-w-0 flex-1 truncate text-text-secondary tabular-nums', size === 'small' ? 'text-body-xsmall' : 'text-body-small')}>
         {formatCount(from)}–{formatCount(to)} of {formatCount(total)} {itemLabel}
       </p>
       <nav aria-label="Pagination" className="flex shrink-0 items-center gap-1 rounded-lg border border-border-default bg-surface-base p-1 shadow-xs">
@@ -44,20 +47,23 @@ export function PaginationBar({
         <IconButton icon="chevron_left" label="Previous page" size={32} disabled={page <= 1} onClick={() => onPageChange(page - 1)} />
         {pageRange(page, pageCount).map((item, index) =>
           item === 'ellipsis' ? (
-            <PageEllipsis key={`gap${index}`} />
+            <PageEllipsis key={`gap${index}`} size={size} />
           ) : (
-            <PageNumber key={item} page={item} active={item === page} onSelect={onPageChange} />
+            <PageNumber key={item} page={item} active={item === page} onSelect={onPageChange} size={size} />
           ),
         )}
         <IconButton icon="chevron_right" label="Next page" size={32} disabled={page >= pageCount} onClick={() => onPageChange(page + 1)} />
         <IconButton icon="last_page" label="Last page" size={32} disabled={page >= pageCount} onClick={() => onPageChange(pageCount)} />
       </nav>
       <div className="flex min-w-0 flex-1 items-center justify-end gap-2">
-        <span className="text-body-small whitespace-nowrap text-text-secondary">Items per page:</span>
+        <span className={cn('whitespace-nowrap text-text-secondary', size === 'small' ? 'text-body-xsmall' : 'text-body-small')}>Items per page:</span>
         <RadixSelect.Root value={String(pageSize)} onValueChange={value => onPageSizeChange?.(Number(value))}>
           <RadixSelect.Trigger
             aria-label="Items per page"
-            className="group flex cursor-pointer items-center gap-2 rounded-md border border-border-default bg-surface-base py-2 pr-2 pl-3 text-label-base text-text-primary hover:border-border-strong outline-border-focus focus-visible:outline-2 focus-visible:-outline-offset-2"
+            className={cn(
+              'group flex cursor-pointer items-center gap-2 rounded-md border border-border-default bg-surface-base pr-2 pl-3 text-text-primary hover:border-border-strong outline-border-focus focus-visible:outline-2 focus-visible:-outline-offset-2',
+              size === 'small' ? 'h-8 text-label-small' : 'py-2 text-label-base',
+            )}
           >
             <RadixSelect.Value />
             <Icon name="expand_more" size={16} className="text-text-secondary transition-transform group-data-[state=open]:rotate-180" />

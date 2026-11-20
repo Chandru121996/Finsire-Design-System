@@ -76,6 +76,9 @@ type Story = StoryObj<typeof meta>
 /** Figma State=Default. Try: tick rows, sort by Date or Amount, type in the filter, hide a column, change page. */
 export const Default: Story = { args: { selectedIds: undefined } }
 
+/** Density=Compact: 40px rows, one line per cell. Long text ends in "…"; point at it for the full text. */
+export const Compact: Story = { args: { density: 'compact', pageSize: 10 } }
+
 /** Figma State=Empty. */
 export const Empty: Story = { args: { data: [] } }
 

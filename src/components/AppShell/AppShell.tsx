@@ -29,17 +29,19 @@ export interface PageHeaderProps {
   description?: ReactNode
   /** Buttons or controls on the right. */
   actions?: ReactNode
+  /** Compact: smaller title (H4) and description, for dense data screens. Use small buttons in actions. */
+  compact?: boolean
 }
 
-/** Page title (Heading H3) with optional description and actions on the right. */
-export function PageHeader({ title, description, actions }: PageHeaderProps) {
+/** Page title (Heading H3, or H4 when compact) with optional description and actions on the right. */
+export function PageHeader({ title, description, actions, compact = false }: PageHeaderProps) {
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-center justify-between gap-4">
-        <h1 className="text-heading-h3 text-text-primary">{title}</h1>
-        {actions && <div className="flex shrink-0 items-center gap-3">{actions}</div>}
+    <div className="flex items-center justify-between gap-4">
+      <div className="flex min-w-0 flex-col gap-1">
+        <h1 className={cn('truncate text-text-primary', compact ? 'text-heading-h4' : 'text-heading-h3')}>{title}</h1>
+        {description && <p className={cn('text-text-secondary', compact ? 'text-body-small' : 'text-body-base')}>{description}</p>}
       </div>
-      {description && <p className="text-body-base text-text-secondary">{description}</p>}
+      {actions && <div className={cn('flex shrink-0 items-center', compact ? 'gap-2' : 'gap-3')}>{actions}</div>}
     </div>
   )
 }

@@ -6,7 +6,7 @@ import { Checkbox } from '../components/Checkbox/Checkbox'
 import { FilterChip } from '../components/FilterChip/FilterChip'
 import { IconButton } from '../components/IconButton/IconButton'
 import { PaginationBar } from '../components/Pagination/PaginationBar'
-import { CellActions, CellTextBadge, Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow } from '../components/Table/Table'
+import { CellActions, CellTextBadge, Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow, TruncatedText } from '../components/Table/Table'
 import { shellProps } from './shell'
 
 interface LogEntry {
@@ -67,32 +67,33 @@ export function MasterLog() {
     })
 
   return (
-    <AppShell {...shellProps('master-log', { label: 'Master Log', icon: 'list_alt' })} className="flex flex-col gap-5">
+    <AppShell {...shellProps('master-log', { label: 'Master Log', icon: 'list_alt' })} className="flex flex-col gap-4">
       <PageHeader
+        compact
         title="Master Log"
         description="List of User"
         actions={
           <>
-            <IconButton icon="search" label="Search the log" bordered />
-            <IconButton icon="view_column" label="Choose columns" bordered />
-            <Button leadingIcon="download">Download</Button>
+            <IconButton icon="search" label="Search the log" size={32} bordered />
+            <IconButton icon="view_column" label="Choose columns" size={32} bordered />
+            <Button size="small" leadingIcon="download">Download</Button>
           </>
         }
       />
       <div className="flex flex-wrap gap-2">
-        <FilterChip variant="all-filters" />
-        {filters.map(label => <FilterChip key={label}>{label}</FilterChip>)}
+        <FilterChip size="small" variant="all-filters" />
+        {filters.map(label => <FilterChip key={label} size="small">{label}</FilterChip>)}
       </div>
-      <Table containerClassName="min-h-0 flex-1" className="table-fixed">
+      <Table density="compact" containerClassName="min-h-0 flex-1" className="min-w-[1320px] table-fixed">
         <colgroup>
-          <col className="w-[56px]" />
-          <col className="w-[150px]" />
-          <col className="w-[150px]" />
-          <col className="w-[160px]" />
-          <col className="w-[248px]" />
-          <col className="w-[150px]" />
-          <col className="w-[180px]" />
+          <col className="w-12" />
           <col className="w-[120px]" />
+          <col className="w-[130px]" />
+          <col className="w-[160px]" />
+          <col />
+          <col className="w-[200px]" />
+          <col className="w-[250px]" />
+          <col className="w-[100px]" />
           <col className="w-[104px]" />
         </colgroup>
         <TableHeader>
@@ -114,11 +115,11 @@ export function MasterLog() {
           {entries.map((e, i) => (
             <TableRow key={e.id} selected={selected.has(e.id)}>
               <TableCell><Checkbox aria-label={`Select ${e.user}`} checked={selected.has(e.id)} onCheckedChange={() => toggle(e.id)} /></TableCell>
-              <TableCell className="truncate">{e.user}</TableCell>
-              <TableCell className="truncate">{e.distributor}</TableCell>
-              <TableCell className="whitespace-nowrap tabular-nums">{e.phone}</TableCell>
-              <TableCell className="py-2"><span className="line-clamp-2">{e.event}</span></TableCell>
-              <TableCell className="py-2 tabular-nums">{e.date}<br />{e.time}</TableCell>
+              <TableCell><TruncatedText>{e.user}</TruncatedText></TableCell>
+              <TableCell><TruncatedText>{e.distributor}</TruncatedText></TableCell>
+              <TableCell className="tabular-nums"><TruncatedText>{e.phone}</TruncatedText></TableCell>
+              <TableCell><TruncatedText>{e.event}</TruncatedText></TableCell>
+              <TableCell className="tabular-nums"><TruncatedText>{e.date} {e.time}</TruncatedText></TableCell>
               <TableCell>
                 <CellTextBadge
                   text={e.admin}
@@ -137,6 +138,7 @@ export function MasterLog() {
         </TableBody>
       </Table>
       <PaginationBar
+        size="small"
         className="shrink-0"
         page={page}
         pageSize={pageSize}

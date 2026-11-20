@@ -6,7 +6,7 @@ import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMe
 import { Pagination } from '../Pagination/Pagination'
 import { SearchInput } from '../SearchInput/SearchInput'
 import { Skeleton } from '../Skeleton/Skeleton'
-import { Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow } from './Table'
+import { Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow, type TableDensity } from './Table'
 
 export interface DataTableColumn<Row> {
   id: string
@@ -41,6 +41,8 @@ export interface DataTableProps<Row> {
   /** Menu or buttons at the end of each row. */
   rowActions?: (row: Row) => ReactNode
   onRowClick?: (row: Row) => void
+  /** Row height: comfortable (56px, default) or compact (40px, one line per cell). */
+  density?: TableDensity
   /** Figma State=Loading. */
   loading?: boolean
   /** Shown when there are no rows (Figma State=Empty), usually an EmptyState. */
@@ -65,6 +67,7 @@ export function DataTable<Row>({
   toolbar,
   rowActions,
   onRowClick,
+  density = 'comfortable',
   loading = false,
   empty,
   pageSize = 10,
@@ -173,7 +176,7 @@ export function DataTable<Row>({
         </DropdownMenu>
       </div>
 
-      <Table aria-busy={loading}>
+      <Table aria-busy={loading} density={density}>
         <colgroup>
           {selectable && <col className="w-[56px]" />}
           {visibleColumns.map(column => <col key={column.id} style={column.width ? { width: column.width } : undefined} />)}
@@ -212,7 +215,7 @@ export function DataTable<Row>({
                 {visibleColumns.map((column, i) => (
                   <TableCell key={column.id} align={column.align}>
                     {i === 0 ? (
-                      <div className="flex items-center gap-3"><Skeleton variant="circle" className="size-8" /><Skeleton className="w-[160px]" /></div>
+                      <div className="flex items-center gap-3"><Skeleton variant="circle" className={density === 'compact' ? 'size-6' : 'size-8'} /><Skeleton className="w-[160px]" /></div>
                     ) : (
                       <Skeleton className={cn('w-[72px]', column.align === 'right' && 'ml-auto')} />
                     )}

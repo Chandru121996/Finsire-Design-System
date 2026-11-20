@@ -58,6 +58,8 @@ import { Button, Badge, KpiCard, formatINR } from './index'
 - Dark mode: add the `dark` class to `<html>`.
 - Toasts: put `<Toaster />` once in the app, then call `toast({ variant: 'success', title: 'Transfer sent' })`.
 - Money: `formatINR`, `formatINRCompact` (₹224 Cr, ₹3.4 L), `formatNumberIN` and `formatDateIN` use Indian grouping.
+- Dense screens: `<Table density="compact">` / `<DataTable density="compact">` (40px rows, one line per cell, full text in a tooltip),
+  `<FilterChip size="small">`, `<PaginationBar size="small">` and `<PageHeader compact>`. The Master Log screen uses all of them.
 
 ## Design tokens
 
