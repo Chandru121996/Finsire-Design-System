@@ -48,6 +48,8 @@ export interface SidebarProps {
   className?: string
 }
 
+const startsBlock = (group: SidebarGroup, index: number) => !!group.items[index].children && !!group.items[index - 1]?.children
+
 const containsActive = (link: SidebarLink, activeId?: string): boolean =>
   link.id === activeId || !!link.children?.some(child => containsActive(child, activeId))
 
@@ -55,7 +57,7 @@ export function Sidebar({
   groups,
   activeId,
   onNavigate,
-  logo = { full: <FinsireLogo />, mark: <FinsireMark /> },
+  logo = { full: <FinsireLogo className="h-[28px] w-[123px]" />, mark: <FinsireMark className="h-[21px] w-[17px]" /> },
   workspace,
   state,
   defaultState = 'pinned',
@@ -98,13 +100,13 @@ export function Sidebar({
     <nav
       aria-label="Main"
       className={cn(
-        'flex h-full flex-col gap-1 overflow-y-auto border-r border-border-default bg-surface-base pt-3 pb-4',
+        'flex h-full flex-col gap-3 overflow-y-auto border-r border-border-default bg-surface-base pt-3 pb-4',
         showFull ? 'w-[260px] px-3' : 'w-[72px] items-center px-2',
         collapsed && hovering && 'absolute inset-y-0 left-0 z-40 shadow-xl',
       )}
     >
       {showFull ? (
-        <div className="flex shrink-0 items-center gap-2 px-1 pt-1">
+        <div className="flex h-8 shrink-0 items-center gap-2 px-1">
           {logo.full}
           <span className="flex-1" />
           {/* Outline pin = not pinned; filled pin = pinned. Clicking switches. */}
@@ -118,7 +120,7 @@ export function Sidebar({
           />
         </div>
       ) : (
-        <div className="flex shrink-0 flex-col items-center pt-2">{logo.mark}</div>
+        <div className="flex shrink-0 flex-col items-center pt-[6px]">{logo.mark}</div>
       )}
 
       {workspace &&
@@ -126,7 +128,7 @@ export function Sidebar({
           <button
             type="button"
             onClick={workspace.onClick}
-            className="flex w-full shrink-0 cursor-pointer items-center gap-2 rounded-md border border-border-default bg-surface-muted p-2 text-left hover:border-border-strong outline-border-focus focus-visible:outline-2 focus-visible:-outline-offset-2"
+            className="flex w-full shrink-0 cursor-pointer items-center gap-2 rounded-md border border-border-default bg-surface-muted px-2 py-1 text-left hover:border-border-strong outline-border-focus focus-visible:outline-2 focus-visible:-outline-offset-2"
           >
             <Avatar initials={workspace.initials} size={32} />
             <span className="flex min-w-0 flex-1 flex-col">
@@ -140,7 +142,7 @@ export function Sidebar({
             type="button"
             onClick={workspace.onClick}
             aria-label={workspace.name}
-            className="flex size-12 shrink-0 cursor-pointer items-center justify-center rounded-md border border-border-default bg-surface-muted outline-border-focus focus-visible:outline-2"
+            className="flex h-[46px] w-12 shrink-0 cursor-pointer items-center justify-center rounded-md border border-border-default bg-surface-muted outline-border-focus focus-visible:outline-2"
           >
             <Avatar initials={workspace.initials.slice(0, 1)} size={32} />
           </button>
@@ -156,9 +158,10 @@ export function Sidebar({
           >
             {showFull ? group.label : (group.shortLabel ?? group.label)}
           </p>
-          {group.items.map(item =>
+          {group.items.map((item, index) =>
             showFull ? (
-              <div key={item.id} className="flex flex-col gap-1">
+              // A parent that follows another parent starts its own block (12px above), e.g. Assets after Users.
+              <div key={item.id} className={cn('flex flex-col gap-1', startsBlock(group, index) && 'mt-2')}>
                 <NavItem
                   label={item.label}
                   icon={item.icon}
@@ -189,6 +192,7 @@ export function Sidebar({
                 icon={item.icon ?? 'circle'}
                 href={item.children ? undefined : item.href}
                 active={containsActive(item, activeId)}
+                className={startsBlock(group, index) ? 'mt-2' : undefined}
                 onClick={() => (item.children ? setHovering(true) : navigate(item))}
               />
             ),
