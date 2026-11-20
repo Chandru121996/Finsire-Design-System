@@ -60,7 +60,7 @@ export function TopNavBar({
     </button>
   )
   return (
-    <header className={cn('flex h-16 w-full shrink-0 items-center gap-4 border-b border-border-default bg-surface-base px-6', className)}>
+    <header className={cn('flex h-16 w-full shrink-0 items-center gap-4 border-b border-border-default bg-surface-base pr-6', variant === 'desktop' ? 'pl-3' : 'pl-6', className)}>
       <div className="flex min-w-0 flex-1 items-center gap-1">
         <IconButton icon="arrow_back" label="Back" disabled={!canGoBack} onClick={onBack} />
         <IconButton icon="arrow_forward" label="Forward" disabled={!canGoForward} onClick={onForward} />
@@ -73,7 +73,7 @@ export function TopNavBar({
         ) : (
           <IconButton icon="search" label="Search" onClick={onSearchClick} />
         )}
-        <IconButton icon="help" label="Help" onClick={onHelp} />
+        <IconButton icon="help" label="Help" iconSize={24} onClick={onHelp} />
         <NotificationBell count={notificationCount} onClick={onNotifications} />
         {profileMenu ? (
           <DropdownMenu modal={false}>

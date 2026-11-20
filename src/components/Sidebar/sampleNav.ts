@@ -43,6 +43,7 @@ export const sampleNav: SidebarGroup[] = [
   },
   {
     label: 'Other',
+    bottom: true,
     items: [
       { id: 'distributor', label: 'Distributor', icon: 'hub' },
       { id: 'settings', label: 'Settings', icon: 'settings', children: [{ id: 'roles', label: 'Roles' }, { id: 'audit', label: 'Audit trail' }] },

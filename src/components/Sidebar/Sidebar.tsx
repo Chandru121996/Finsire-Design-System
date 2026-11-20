@@ -22,6 +22,8 @@ export interface SidebarGroup {
   /** Shorter label for the 72px rail, e.g. "Loan" for "Loan Management". */
   shortLabel?: string
   items: SidebarLink[]
+  /** Sits at the bottom of the sidebar, e.g. "Other" with Settings. */
+  bottom?: boolean
 }
 
 /**
@@ -47,8 +49,6 @@ export interface SidebarProps {
   defaultOpenIds?: string[]
   className?: string
 }
-
-const startsBlock = (group: SidebarGroup, index: number) => !!group.items[index].children && !!group.items[index - 1]?.children
 
 const containsActive = (link: SidebarLink, activeId?: string): boolean =>
   link.id === activeId || !!link.children?.some(child => containsActive(child, activeId))
@@ -148,8 +148,14 @@ export function Sidebar({
           </button>
         ))}
 
-      {groups.map(group => (
-        <div key={group.label} role="group" aria-label={group.label} className={cn('flex flex-col gap-1', !showFull && 'items-center')}>
+      {groups.map((group, groupIndex) => (
+        <div
+          key={group.label}
+          role="group"
+          aria-label={group.label}
+          // The first bottom group (and any after it) is pushed to the bottom of the sidebar.
+          className={cn('flex flex-col', !showFull && 'items-center', group.bottom && !groups[groupIndex - 1]?.bottom && 'mt-auto')}
+        >
           <p
             className={cn(
               'truncate py-2 text-label-small text-text-tertiary',
@@ -158,45 +164,45 @@ export function Sidebar({
           >
             {showFull ? group.label : (group.shortLabel ?? group.label)}
           </p>
-          {group.items.map((item, index) =>
-            showFull ? (
-              // A parent that follows another parent starts its own block (12px above), e.g. Assets after Users.
-              <div key={item.id} className={cn('flex flex-col gap-1', startsBlock(group, index) && 'mt-2')}>
-                <NavItem
+          <div className={cn('flex flex-col gap-1', !showFull && 'items-center')}>
+            {group.items.map(item =>
+              showFull ? (
+                <div key={item.id} className="flex flex-col gap-1">
+                  <NavItem
+                    label={item.label}
+                    icon={item.icon}
+                    href={item.href}
+                    type={item.children ? 'parent' : 'item'}
+                    open={openIds.has(item.id)}
+                    active={item.children ? false : item.id === activeId}
+                    onClick={() => (item.children ? toggleOpen(item.id) : navigate(item))}
+                  />
+                  {item.children &&
+                    openIds.has(item.id) &&
+                    item.children.map(child => (
+                      <NavItem
+                        key={child.id}
+                        type="child"
+                        label={child.label}
+                        href={child.href}
+                        count={child.count}
+                        active={child.id === activeId}
+                        onClick={() => navigate(child)}
+                      />
+                    ))}
+                </div>
+              ) : (
+                <SidebarItem
+                  key={item.id}
                   label={item.label}
-                  icon={item.icon}
-                  href={item.href}
-                  type={item.children ? 'parent' : 'item'}
-                  open={openIds.has(item.id)}
-                  active={item.children ? false : item.id === activeId}
-                  onClick={() => (item.children ? toggleOpen(item.id) : navigate(item))}
+                  icon={item.icon ?? 'circle'}
+                  href={item.children ? undefined : item.href}
+                  active={containsActive(item, activeId)}
+                  onClick={() => (item.children ? setHovering(true) : navigate(item))}
                 />
-                {item.children &&
-                  openIds.has(item.id) &&
-                  item.children.map(child => (
-                    <NavItem
-                      key={child.id}
-                      type="child"
-                      label={child.label}
-                      href={child.href}
-                      count={child.count}
-                      active={child.id === activeId}
-                      onClick={() => navigate(child)}
-                    />
-                  ))}
-              </div>
-            ) : (
-              <SidebarItem
-                key={item.id}
-                label={item.label}
-                icon={item.icon ?? 'circle'}
-                href={item.children ? undefined : item.href}
-                active={containsActive(item, activeId)}
-                className={startsBlock(group, index) ? 'mt-2' : undefined}
-                onClick={() => (item.children ? setHovering(true) : navigate(item))}
-              />
-            ),
-          )}
+              ),
+            )}
+          </div>
         </div>
       ))}
     </nav>
